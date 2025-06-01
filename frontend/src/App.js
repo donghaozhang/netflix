@@ -6,7 +6,8 @@ import {
   HeroBanner,
   ContentRow,
   MovieModal,
-  LoadingSpinner
+  LoadingSpinner,
+  SignInPage
 } from './components';
 
 // TMDB API configuration
