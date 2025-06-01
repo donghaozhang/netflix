@@ -10,9 +10,10 @@ const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/w1280';
 
 // Netflix Header Component
-export const NetflixHeader = ({ onSearch }) => {
+export const NetflixHeader = ({ onSearch, userEmail, onSignOut }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,8 +62,44 @@ export const NetflixHeader = ({ onSearch }) => {
               🔍
             </button>
           </form>
-          <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
-            <span className="text-white font-bold">U</span>
+          
+          {/* User Menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center space-x-2 hover:text-gray-300 transition-colors"
+            >
+              <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
+                <span className="text-white font-bold text-sm">
+                  {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
+                </span>
+              </div>
+              <span className="text-white text-sm hidden sm:block">
+                {userEmail ? userEmail.split('@')[0] : 'User'}
+              </span>
+            </button>
+            
+            {showUserMenu && (
+              <motion.div
+                className="absolute right-0 top-12 bg-black/90 backdrop-blur-sm border border-gray-700 rounded-lg py-2 min-w-[200px]"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="px-4 py-2 border-b border-gray-700">
+                  <p className="text-white text-sm font-medium">
+                    {userEmail}
+                  </p>
+                  <p className="text-gray-400 text-xs">Premium Member</p>
+                </div>
+                <button
+                  onClick={onSignOut}
+                  className="w-full text-left px-4 py-2 text-white hover:bg-gray-800 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </motion.div>
+            )}
           </div>
         </div>
       </div>
