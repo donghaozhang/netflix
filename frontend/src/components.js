@@ -38,7 +38,7 @@ export const NetflixHeader = ({ onSearch }) => {
     >
       <div className="flex items-center justify-between px-4 md:px-16 py-4">
         <div className="flex items-center space-x-8">
-          <h1 className="text-red-600 text-3xl font-bold tracking-wide">NETFLIX</h1>
+          <h1 className="text-red-600 text-3xl font-bold tracking-wide">QURIOSITY</h1>
           <nav className="hidden md:flex space-x-6">
             <a href="#" className="text-white hover:text-gray-300 transition-colors">Home</a>
             <a href="#" className="text-white hover:text-gray-300 transition-colors">TV Shows</a>
@@ -206,9 +206,9 @@ export const MovieCard = ({ movie, onClick, index }) => {
     'https://images.pexels.com/photos/7941158/pexels-photo-7941158.jpeg'
   ];
 
-  const imageUrl = movie.poster_path 
-    ? IMAGE_BASE_URL + movie.poster_path 
-    : fallbackImages[index % fallbackImages.length];
+  // Use Pokemon-specific image if available, otherwise TMDB poster, otherwise fallback
+  const imageUrl = movie.pokemon_image || 
+    (movie.poster_path ? IMAGE_BASE_URL + movie.poster_path : fallbackImages[index % fallbackImages.length]);
 
   return (
     <motion.div
@@ -249,6 +249,12 @@ export const MovieCard = ({ movie, onClick, index }) => {
                   ℹ Info
                 </button>
               </div>
+              {movie.vote_average && (
+                <div className="flex items-center mt-2">
+                  <span className="text-yellow-400 text-xs">⭐</span>
+                  <span className="text-white text-xs ml-1">{movie.vote_average}/10</span>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

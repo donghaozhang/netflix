@@ -27,6 +27,56 @@ function App() {
   const mockMovieData = {
     trending: [
       {
+        id: 1001,
+        title: "Pokémon Detective Pikachu",
+        overview: "In a world where people collect Pokémon to do battle, a boy comes across an intelligent talking Pikachu who seeks to be a detective.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.1,
+        release_date: "2019-05-10",
+        pokemon_image: "https://images.pexels.com/photos/1716861/pexels-photo-1716861.jpeg"
+      },
+      {
+        id: 1002,
+        title: "Pokémon: The First Movie - Mewtwo Strikes Back",
+        overview: "Scientists genetically create a new Pokémon, Mewtwo, but the results are horrific and disastrous. Ash and his friends must fight against this powerful artificial Pokémon.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 7.8,
+        release_date: "1998-07-18",
+        pokemon_image: "https://images.unsplash.com/photo-1609372332255-611485350f25"
+      },
+      {
+        id: 1003,
+        title: "Pokémon: The Movie 2000",
+        overview: "Ash Ketchum must gather the three spheres of fire, ice and lightning in order to restore balance to the Orange Islands.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 7.6,
+        release_date: "1999-07-17",
+        pokemon_image: "https://images.unsplash.com/photo-1638964758061-117853a20865"
+      },
+      {
+        id: 1004,
+        title: "Pokémon 3: The Movie - Spell of the Unown",
+        overview: "Young Molly Hale's father disappears while investigating the mysterious Unown. The Unown create a crystal palace and make Molly's wishes come true.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 7.4,
+        release_date: "2000-07-08",
+        pokemon_image: "https://images.pexels.com/photos/31002073/pexels-photo-31002073.jpeg"
+      },
+      {
+        id: 1005,
+        title: "Pokémon: Zoroark - Master of Illusions",
+        overview: "A greedy businessman tries to take over a city with the help of a legendary Pokémon, and only the true legendary Pokémon Zoroark can stop him.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 7.5,
+        release_date: "2010-07-10",
+        pokemon_image: "https://images.pexels.com/photos/32344214/pexels-photo-32344214.jpeg"
+      },
+      {
         id: 1,
         title: "Stranger Things",
         overview: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.",
@@ -43,33 +93,6 @@ function App() {
         backdrop_path: null,
         vote_average: 8.6,
         release_date: "2016-11-04"
-      },
-      {
-        id: 3,
-        title: "Black Mirror",
-        overview: "An anthology series exploring a twisted, high-tech multiverse where humanity's greatest innovations and darkest instincts collide.",
-        poster_path: null,
-        backdrop_path: null,
-        vote_average: 8.8,
-        release_date: "2011-12-04"
-      },
-      {
-        id: 4,
-        title: "Ozark",
-        overview: "A financial advisor drags his family from Chicago to the Missouri Ozarks, where he must launder $500 million in five years to appease a drug boss.",
-        poster_path: null,
-        backdrop_path: null,
-        vote_average: 8.4,
-        release_date: "2017-07-21"
-      },
-      {
-        id: 5,
-        title: "House of Cards",
-        overview: "A Congressman works with his equally conniving wife to exact revenge on the people who betrayed him.",
-        poster_path: null,
-        backdrop_path: null,
-        vote_average: 8.7,
-        release_date: "2013-02-01"
       }
     ],
     popular: [
@@ -159,17 +182,23 @@ function App() {
 
   const fetchMovieCategories = async () => {
     try {
-      const [trending, popular, topRated, action, comedy, horror] = await Promise.all([
+      const [trending, popular, topRated, action, comedy, horror, pokemon] = await Promise.all([
         axios.get(`${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}`),
         axios.get(`${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}`),
         axios.get(`${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}`),
         axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=28`),
         axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=35`),
-        axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=27`)
+        axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=27`),
+        axios.get(`${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=pokemon`)
       ]);
 
+      // Mix Pokemon movies with trending content for a dynamic experience
+      const pokemonMovies = pokemon.data.results.slice(0, 3);
+      const trendingMovies = trending.data.results.slice(0, 15);
+      const mixedTrending = [...mockMovieData.trending.slice(0, 5), ...pokemonMovies, ...trendingMovies];
+
       setMovieCategories({
-        trending: trending.data.results,
+        trending: mixedTrending,
         popular: popular.data.results,
         topRated: topRated.data.results,
         action: action.data.results,
