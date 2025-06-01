@@ -150,8 +150,41 @@ function App() {
   };
 
   useEffect(() => {
-    initializeNetflix();
+    // Check for stored authentication
+    const storedAuth = localStorage.getItem('quriosity_auth');
+    if (storedAuth) {
+      const authData = JSON.parse(storedAuth);
+      if (authData.email === 'zdhpeter@gmail.com') {
+        setIsAuthenticated(true);
+        setUserEmail(authData.email);
+        initializeNetflix();
+      } else {
+        localStorage.removeItem('quriosity_auth');
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
   }, []);
+
+  const handleSignIn = (email) => {
+    // Store authentication
+    localStorage.setItem('quriosity_auth', JSON.stringify({ email, timestamp: Date.now() }));
+    setIsAuthenticated(true);
+    setUserEmail(email);
+    setLoading(true);
+    initializeNetflix();
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('quriosity_auth');
+    setIsAuthenticated(false);
+    setUserEmail('');
+    setMovieCategories({});
+    setFeaturedMovie(null);
+    setSearchResults([]);
+    setIsSearching(false);
+  };
 
   const initializeNetflix = async () => {
     try {
