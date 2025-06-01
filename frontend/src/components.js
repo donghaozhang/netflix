@@ -10,9 +10,10 @@ const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/w1280';
 
 // Netflix Header Component
-export const NetflixHeader = ({ onSearch }) => {
+export const NetflixHeader = ({ onSearch, userEmail, onSignOut }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,8 +62,44 @@ export const NetflixHeader = ({ onSearch }) => {
               🔍
             </button>
           </form>
-          <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
-            <span className="text-white font-bold">U</span>
+          
+          {/* User Menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center space-x-2 hover:text-gray-300 transition-colors"
+            >
+              <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
+                <span className="text-white font-bold text-sm">
+                  {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
+                </span>
+              </div>
+              <span className="text-white text-sm hidden sm:block">
+                {userEmail ? userEmail.split('@')[0] : 'User'}
+              </span>
+            </button>
+            
+            {showUserMenu && (
+              <motion.div
+                className="absolute right-0 top-12 bg-black/90 backdrop-blur-sm border border-gray-700 rounded-lg py-2 min-w-[200px]"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="px-4 py-2 border-b border-gray-700">
+                  <p className="text-white text-sm font-medium">
+                    {userEmail}
+                  </p>
+                  <p className="text-gray-400 text-xs">Premium Member</p>
+                </div>
+                <button
+                  onClick={onSignOut}
+                  className="w-full text-left px-4 py-2 text-white hover:bg-gray-800 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </motion.div>
+            )}
           </div>
         </div>
       </div>
@@ -463,3 +500,156 @@ export const LoadingSpinner = () => (
     />
   </div>
 );
+
+// Sign In Component
+export const SignInPage = ({ onSignIn }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    // Simulate loading for better UX
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    if (email === 'zdhpeter@gmail.com') {
+      onSignIn(email);
+    } else {
+      setError('Invalid email. Only zdhpeter@gmail.com can access QURIOSITY.');
+    }
+    setIsLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-black to-red-900/10" />
+      
+      {/* Animated background elements */}
+      <motion.div
+        className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-600/10 rounded-full blur-3xl"
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3]
+        }}
+        transition={{ duration: 4, repeat: Infinity }}
+      />
+      <motion.div
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-red-600/5 rounded-full blur-3xl"
+        animate={{ 
+          scale: [1.2, 1, 1.2],
+          opacity: [0.2, 0.4, 0.2]
+        }}
+        transition={{ duration: 6, repeat: Infinity }}
+      />
+
+      <motion.div
+        className="relative z-10 w-full max-w-md p-8"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        {/* QURIOSITY Logo */}
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <h1 className="text-red-600 text-6xl font-bold tracking-wide mb-4">QURIOSITY</h1>
+          <p className="text-gray-400 text-lg">Your exclusive streaming destination</p>
+        </motion.div>
+
+        {/* Sign In Form */}
+        <motion.div
+          className="bg-black/40 backdrop-blur-sm rounded-lg p-8 border border-gray-800"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <h2 className="text-white text-2xl font-semibold mb-6 text-center">Sign In</h2>
+          
+          <form onSubmit={handleSignIn} className="space-y-6">
+            <div>
+              <label className="block text-gray-300 text-sm font-medium mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-colors"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-300 text-sm font-medium mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-colors"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            {error && (
+              <motion.div
+                className="bg-red-900/30 border border-red-600 rounded-lg p-3"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <p className="text-red-400 text-sm text-center">{error}</p>
+              </motion.div>
+            )}
+
+            <motion.button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Signing In...</span>
+                </div>
+              ) : (
+                'Sign In to QURIOSITY'
+              )}
+            </motion.button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-400 text-sm">
+              Access is exclusive to authorized users only
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Demo hint */}
+        <motion.div
+          className="mt-6 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <p className="text-gray-500 text-xs">
+            Demo Access: zdhpeter@gmail.com
+          </p>
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+};

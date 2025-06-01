@@ -6,7 +6,8 @@ import {
   HeroBanner,
   ContentRow,
   MovieModal,
-  LoadingSpinner
+  LoadingSpinner,
+  SignInPage
 } from './components';
 
 // TMDB API configuration
@@ -16,6 +17,8 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 // Netflix Clone Main App Component
 function App() {
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
   const [featuredMovie, setFeaturedMovie] = useState(null);
   const [movieCategories, setMovieCategories] = useState({});
   const [selectedMovie, setSelectedMovie] = useState(null);
@@ -147,8 +150,41 @@ function App() {
   };
 
   useEffect(() => {
-    initializeNetflix();
+    // Check for stored authentication
+    const storedAuth = localStorage.getItem('quriosity_auth');
+    if (storedAuth) {
+      const authData = JSON.parse(storedAuth);
+      if (authData.email === 'zdhpeter@gmail.com') {
+        setIsAuthenticated(true);
+        setUserEmail(authData.email);
+        initializeNetflix();
+      } else {
+        localStorage.removeItem('quriosity_auth');
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
   }, []);
+
+  const handleSignIn = (email) => {
+    // Store authentication
+    localStorage.setItem('quriosity_auth', JSON.stringify({ email, timestamp: Date.now() }));
+    setIsAuthenticated(true);
+    setUserEmail(email);
+    setLoading(true);
+    initializeNetflix();
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('quriosity_auth');
+    setIsAuthenticated(false);
+    setUserEmail('');
+    setMovieCategories({});
+    setFeaturedMovie(null);
+    setSearchResults([]);
+    setIsSearching(false);
+  };
 
   const initializeNetflix = async () => {
     try {
@@ -244,10 +280,19 @@ function App() {
     return <LoadingSpinner />;
   }
 
+  // Show sign-in page if not authenticated
+  if (!isAuthenticated) {
+    return <SignInPage onSignIn={handleSignIn} />;
+  }
+
   return (
     <div className="bg-black min-h-screen">
       {/* Netflix Header */}
-      <NetflixHeader onSearch={handleSearch} />
+      <NetflixHeader 
+        onSearch={handleSearch} 
+        userEmail={userEmail}
+        onSignOut={handleSignOut}
+      />
 
       {/* Main Content */}
       <main>
