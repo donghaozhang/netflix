@@ -1,52 +1,313 @@
-import { useEffect } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './App.css';
+import {
+  NetflixHeader,
+  HeroBanner,
+  ContentRow,
+  MovieModal,
+  LoadingSpinner
+} from './components';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// TMDB API configuration
+const TMDB_API_KEY = 'c8dea14dc917687ac631a52620e4f7ad';
+const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
+// Netflix Clone Main App Component
+function App() {
+  const [loading, setLoading] = useState(true);
+  const [featuredMovie, setFeaturedMovie] = useState(null);
+  const [movieCategories, setMovieCategories] = useState({});
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Mock data fallback in case API fails
+  const mockMovieData = {
+    trending: [
+      {
+        id: 1,
+        title: "Stranger Things",
+        overview: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.7,
+        release_date: "2016-07-15"
+      },
+      {
+        id: 2,
+        title: "The Crown",
+        overview: "Follows the political rivalries and romance of Queen Elizabeth II's reign and the events that shaped the second half of the twentieth century.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.6,
+        release_date: "2016-11-04"
+      },
+      {
+        id: 3,
+        title: "Black Mirror",
+        overview: "An anthology series exploring a twisted, high-tech multiverse where humanity's greatest innovations and darkest instincts collide.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.8,
+        release_date: "2011-12-04"
+      },
+      {
+        id: 4,
+        title: "Ozark",
+        overview: "A financial advisor drags his family from Chicago to the Missouri Ozarks, where he must launder $500 million in five years to appease a drug boss.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.4,
+        release_date: "2017-07-21"
+      },
+      {
+        id: 5,
+        title: "House of Cards",
+        overview: "A Congressman works with his equally conniving wife to exact revenge on the people who betrayed him.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.7,
+        release_date: "2013-02-01"
+      }
+    ],
+    popular: [
+      {
+        id: 6,
+        title: "Wednesday",
+        overview: "Smart, sarcastic and a little dead inside, Wednesday Addams investigates a murder spree while making new friends — and foes — at Nevermore Academy.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.5,
+        release_date: "2022-11-23"
+      },
+      {
+        id: 7,
+        title: "Squid Game",
+        overview: "Hundreds of cash-strapped players accept a strange invitation to compete in children's games for a tempting prize, but the stakes are deadly.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.0,
+        release_date: "2021-09-17"
+      },
+      {
+        id: 8,
+        title: "Money Heist",
+        overview: "An unusual group of robbers attempt to carry out the most perfect robbery in Spanish history - stealing 2.4 billion euros from the Royal Mint of Spain.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.2,
+        release_date: "2017-05-02"
+      }
+    ],
+    action: [
+      {
+        id: 9,
+        title: "The Witcher",
+        overview: "Geralt of Rivia, a mutated monster-hunter for hire, journeys toward his destiny in a turbulent world where people often prove more wicked than beasts.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.2,
+        release_date: "2019-12-20"
+      },
+      {
+        id: 10,
+        title: "Daredevil",
+        overview: "A blind lawyer by day, vigilante by night. Matt Murdock fights the crime of New York as Daredevil.",
+        poster_path: null,
+        backdrop_path: null,
+        vote_average: 8.6,
+        release_date: "2015-04-10"
+      }
+    ]
   };
 
   useEffect(() => {
-    helloWorldApi();
+    initializeNetflix();
   }, []);
 
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+  const initializeNetflix = async () => {
+    try {
+      await Promise.all([
+        fetchFeaturedContent(),
+        fetchMovieCategories()
+      ]);
+    } catch (error) {
+      console.error('Error initializing Netflix:', error);
+      // Use mock data as fallback
+      setFeaturedMovie(mockMovieData.trending[0]);
+      setMovieCategories(mockMovieData);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-function App() {
+  const fetchFeaturedContent = async () => {
+    try {
+      const response = await axios.get(
+        `${TMDB_BASE_URL}/trending/movie/day?api_key=${TMDB_API_KEY}`
+      );
+      if (response.data.results.length > 0) {
+        setFeaturedMovie(response.data.results[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching featured content:', error);
+      setFeaturedMovie(mockMovieData.trending[0]);
+    }
+  };
+
+  const fetchMovieCategories = async () => {
+    try {
+      const [trending, popular, topRated, action, comedy, horror] = await Promise.all([
+        axios.get(`${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}`),
+        axios.get(`${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}`),
+        axios.get(`${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}`),
+        axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=28`),
+        axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=35`),
+        axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=27`)
+      ]);
+
+      setMovieCategories({
+        trending: trending.data.results,
+        popular: popular.data.results,
+        topRated: topRated.data.results,
+        action: action.data.results,
+        comedy: comedy.data.results,
+        horror: horror.data.results
+      });
+    } catch (error) {
+      console.error('Error fetching movie categories:', error);
+      setMovieCategories(mockMovieData);
+    }
+  };
+
+  const handleSearch = async (searchTerm) => {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(searchTerm)}`
+      );
+      setSearchResults(response.data.results);
+    } catch (error) {
+      console.error('Error searching movies:', error);
+      setSearchResults([]);
+    }
+  };
+
+  const handleMovieClick = (movie) => {
+    setSelectedMovie(movie);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedMovie(null);
+  };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+    <div className="bg-black min-h-screen">
+      {/* Netflix Header */}
+      <NetflixHeader onSearch={handleSearch} />
+
+      {/* Main Content */}
+      <main>
+        {!isSearching && (
+          <>
+            {/* Hero Banner */}
+            <HeroBanner featuredContent={featuredMovie} />
+
+            {/* Movie Categories */}
+            <div className="space-y-8 pb-20">
+              <ContentRow
+                title="Trending Now"
+                movies={movieCategories.trending || []}
+                onMovieClick={handleMovieClick}
+              />
+              <ContentRow
+                title="Popular Movies"
+                movies={movieCategories.popular || []}
+                onMovieClick={handleMovieClick}
+              />
+              <ContentRow
+                title="Top Rated"
+                movies={movieCategories.topRated || []}
+                onMovieClick={handleMovieClick}
+              />
+              <ContentRow
+                title="Action & Adventure"
+                movies={movieCategories.action || []}
+                onMovieClick={handleMovieClick}
+              />
+              <ContentRow
+                title="Comedies"
+                movies={movieCategories.comedy || []}
+                onMovieClick={handleMovieClick}
+              />
+              <ContentRow
+                title="Horror Movies"
+                movies={movieCategories.horror || []}
+                onMovieClick={handleMovieClick}
+              />
+            </div>
+          </>
+        )}
+
+        {/* Search Results */}
+        {isSearching && (
+          <div className="pt-32 px-4 md:px-16">
+            <h2 className="text-white text-2xl font-semibold mb-8">Search Results</h2>
+            {searchResults.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {searchResults.map((movie, index) => (
+                  <div
+                    key={movie.id}
+                    className="cursor-pointer transform hover:scale-105 transition-transform duration-200"
+                    onClick={() => handleMovieClick(movie)}
+                  >
+                    <div className="bg-gray-800 rounded-lg overflow-hidden h-64">
+                      <img
+                        src={movie.poster_path 
+                          ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+                          : `https://images.pexels.com/photos/7149329/pexels-photo-7149329.jpeg`
+                        }
+                        alt={movie.title}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="p-2">
+                        <h3 className="text-white text-sm font-semibold line-clamp-2">
+                          {movie.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20">
+                <p className="text-gray-400 text-xl">No results found</p>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* Movie Detail Modal */}
+      <MovieModal
+        movie={selectedMovie}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </div>
   );
 }
