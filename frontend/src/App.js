@@ -280,10 +280,19 @@ function App() {
     return <LoadingSpinner />;
   }
 
+  // Show sign-in page if not authenticated
+  if (!isAuthenticated) {
+    return <SignInPage onSignIn={handleSignIn} />;
+  }
+
   return (
     <div className="bg-black min-h-screen">
       {/* Netflix Header */}
-      <NetflixHeader onSearch={handleSearch} />
+      <NetflixHeader 
+        onSearch={handleSearch} 
+        userEmail={userEmail}
+        onSignOut={handleSignOut}
+      />
 
       {/* Main Content */}
       <main>
