@@ -1,0 +1,168 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Development Workflow & Testing
+
+## 🔧 Development Environment Setup
+
+### Prerequisites
+- **Node.js** (for frontend development)
+- **Python 3.8+** (for backend development)  
+- **MongoDB** (running on localhost:27017)
+- **Docker** (optional, for containerized development)
+
+## 🚀 Quick Development Setup
+
+### Manual Development
+```bash
+# Terminal 1: Start MongoDB
+mongod --dbpath /path/to/your/db
+
+# Terminal 2: Backend
+cd backend
+pip install -r requirements.txt
+uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+
+# Terminal 3: Frontend  
+cd frontend
+npm install
+npm start
+```
+
+### Using Development Container
+The project includes VS Code dev container configuration in [.devcontainer/](mdc:.devcontainer/) for consistent development environments.
+
+## 🧪 Testing Framework
+
+### Test Configuration
+- **Test Directory**: [tests/](mdc:tests/) - All test files
+- **Test Results**: [test_result.md](mdc:test_result.md) - Testing documentation and results
+- **Python Testing**: pytest, pytest-cov for coverage
+- **Frontend Testing**: React Testing Library (via react-scripts)
+
+### Running Tests
+```bash
+# Backend tests
+cd backend
+pytest
+
+# Frontend tests  
+cd frontend
+npm test
+
+# Test coverage
+pytest --cov
+```
+
+## 📁 Project Management
+
+### Project Tracking
+- **Emergent Directory**: [.emergent/](mdc:.emergent/) - Project management files
+- **Documentation**: [README.md](mdc:README.md) - Complete project documentation
+
+### Version Control
+- **Git Configuration**: [.gitconfig](mdc:.gitconfig) - Git settings
+- **Git Ignore**: [.gitignore](mdc:.gitignore) - Excluded files and directories
+
+## 🐛 Debugging & Development
+
+### Backend Debugging
+```python
+# Enable debug mode in server.py
+import logging
+logging.basicConfig(level=logging.DEBUG)
+```
+
+### Frontend Debugging
+- **React DevTools**: Browser extension for component inspection
+- **Console Logging**: Check browser console for errors
+- **Network Tab**: Monitor API requests to backend
+
+### Database Debugging
+```bash
+# Connect to MongoDB
+mongo mongodb://localhost:27017/test_database
+
+# View collections
+show collections
+
+# Query status_checks
+db.status_checks.find()
+```
+
+## 🔄 Hot Reload Development
+
+### Backend Hot Reload
+The `--reload` flag enables automatic server restart on code changes:
+```bash
+uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+```
+
+### Frontend Hot Reload
+React's development server automatically reloads on changes:
+```bash
+npm start  # Starts with hot reload enabled
+```
+
+## 📦 Dependency Management
+
+### Backend Dependencies
+- **Main Requirements**: [requirements.txt](mdc:requirements.txt) - Global Python packages
+- **Backend Requirements**: [backend/requirements.txt](mdc:backend/requirements.txt) - Backend-specific packages
+
+### Frontend Dependencies
+- **Package File**: [frontend/package.json](mdc:frontend/package.json) - NPM dependencies
+- **Lock File**: [frontend/yarn.lock](mdc:frontend/yarn.lock) - Version locking
+
+### Adding New Dependencies
+```bash
+# Backend
+pip install new-package
+pip freeze > requirements.txt
+
+# Frontend
+npm install new-package
+# or
+yarn add new-package
+```
+
+## 🌐 API Development
+
+### API Testing
+- **Interactive Docs**: http://localhost:8001/docs (Swagger UI)
+- **Alternative Docs**: http://localhost:8001/redoc
+- **Manual Testing**: Use curl, Postman, or similar tools
+
+### Example API Calls
+```bash
+# Health check
+curl http://localhost:8001/api/
+
+# Create status check
+curl -X POST http://localhost:8001/api/status \
+  -H "Content-Type: application/json" \
+  -d '{"client_name": "test-client"}'
+
+# Get status checks  
+curl http://localhost:8001/api/status
+```
+
+## 🔍 Code Quality
+
+### Linting & Formatting
+```bash
+# Python (backend)
+black backend/
+flake8 backend/
+mypy backend/
+
+# JavaScript (frontend)
+npm run lint  # ESLint
+```
+
+### Code Structure
+- **Backend**: Follow FastAPI best practices
+- **Frontend**: Use React hooks and modern patterns
+- **Database**: Async operations with Motor driver

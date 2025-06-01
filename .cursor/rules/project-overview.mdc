@@ -1,0 +1,69 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Netflix Clone - Project Overview
+
+This is a full-stack Netflix-style streaming application with the following architecture:
+
+## 🏗️ Main Entry Points
+
+- **Frontend**: [frontend/src/index.js](mdc:frontend/src/index.js) - React app entry point
+- **Frontend App**: [frontend/src/App.js](mdc:frontend/src/App.js) - Main React component with routing
+- **Backend Server**: [backend/server.py](mdc:backend/server.py) - FastAPI application with API routes
+- **Docker Setup**: [Dockerfile](mdc:Dockerfile) - Container configuration
+- **Nginx Config**: [nginx.conf](mdc:nginx.conf) - Web server configuration
+
+## 📁 Directory Structure
+
+```
+netflix/
+├── frontend/          # React 19 + Tailwind CSS (Port 3000)
+├── backend/           # FastAPI + MongoDB (Port 8001)  
+├── scripts/           # Deployment scripts
+├── tests/             # Test files
+├── .devcontainer/     # VS Code dev container
+└── .emergent/         # Project management
+```
+
+## 🛠️ Technology Stack
+
+### Frontend
+- **React 19** with Create React App
+- **Tailwind CSS** for styling  
+- **React Router DOM** for navigation
+- **Framer Motion** for animations
+- **Axios** for API calls
+- **React YouTube** for video player
+
+### Backend  
+- **FastAPI** web framework
+- **Motor** async MongoDB driver
+- **Uvicorn** ASGI server
+- **Pydantic** for data validation
+- **PyJWT** for authentication
+
+### Database
+- **MongoDB** (localhost:27017)
+- Database name: `test_database`
+- Collections: `status_checks`
+
+## 🚀 Quick Start Commands
+
+```bash
+# Backend
+cd backend && uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+
+# Frontend  
+cd frontend && npm start
+
+# Docker
+docker-compose up --build
+```
+
+## 🌐 Application URLs
+
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8001
+- API Docs: http://localhost:8001/docs

@@ -1,0 +1,112 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Backend Guide - FastAPI Application
+
+## 📁 Backend Structure
+
+The backend is a FastAPI application with async MongoDB integration and RESTful API design.
+
+## 🗂️ Key Files
+
+### Core Application
+- **Main Server**: [backend/server.py](mdc:backend/server.py) - FastAPI app with API routes and MongoDB setup
+- **Dependencies**: [backend/requirements.txt](mdc:backend/requirements.txt) - Python package requirements
+- **Environment**: [backend/.env](mdc:backend/.env) - Database and configuration settings
+- **Integrations**: [backend/external_integrations/](mdc:backend/external_integrations/) - Third-party service integrations
+
+### Root Configuration
+- **Main Requirements**: [requirements.txt](mdc:requirements.txt) - Global Python dependencies
+- **Docker Config**: [Dockerfile](mdc:Dockerfile) - Container setup
+- **Entry Script**: [entrypoint.sh](mdc:entrypoint.sh) - Container startup logic
+
+## 🛠️ Technology Stack
+
+```python
+# Key Dependencies
+fastapi>=0.110.1      # Web framework
+uvicorn>=0.25.0       # ASGI server  
+motor                 # Async MongoDB driver
+pydantic>=2.9.2       # Data validation
+python-dotenv>=1.0.1  # Environment variables
+```
+
+## 🗄️ Database Setup
+
+### MongoDB Configuration
+- **URL**: `mongodb://localhost:27017` 
+- **Database**: `test_database`
+- **Driver**: Motor (async MongoDB driver)
+- **Collections**: `status_checks`
+
+### Connection Setup
+```python
+from motor.motor_asyncio import AsyncIOMotorClient
+
+mongo_url = os.environ['MONGO_URL']
+client = AsyncIOMotorClient(mongo_url)
+db = client[os.environ['DB_NAME']]
+```
+
+## 🛣️ API Routes
+
+All routes are prefixed with `/api`:
+
+### Health Check
+- **GET /api/**: Root endpoint, returns "Hello World"
+
+### Status Management  
+- **POST /api/status**: Create a new status check
+- **GET /api/status**: Retrieve all status checks
+
+### Data Models
+```python
+class StatusCheck(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    client_name: str
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+```
+
+## 🔧 Development Commands
+
+```bash
+cd backend
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start development server (port 8001)
+uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+
+# View API documentation
+# http://localhost:8001/docs
+```
+
+## 🌐 CORS Configuration
+
+The backend has CORS enabled for all origins:
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["*"],
+    allow_methods=["*"], 
+    allow_headers=["*"],
+)
+```
+
+## 📡 API Documentation
+
+FastAPI automatically generates interactive API docs:
+- **Swagger UI**: http://localhost:8001/docs
+- **ReDoc**: http://localhost:8001/redoc
+
+## 🔐 Environment Variables
+
+Required environment variables in [backend/.env](mdc:backend/.env):
+```bash
+MONGO_URL="mongodb://localhost:27017"
+DB_NAME="test_database"
+```
