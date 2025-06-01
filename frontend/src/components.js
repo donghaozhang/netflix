@@ -38,7 +38,7 @@ export const NetflixHeader = ({ onSearch }) => {
     >
       <div className="flex items-center justify-between px-4 md:px-16 py-4">
         <div className="flex items-center space-x-8">
-          <h1 className="text-red-600 text-3xl font-bold tracking-wide">NETFLIX</h1>
+          <h1 className="text-red-600 text-3xl font-bold tracking-wide">QURIOSITY</h1>
           <nav className="hidden md:flex space-x-6">
             <a href="#" className="text-white hover:text-gray-300 transition-colors">Home</a>
             <a href="#" className="text-white hover:text-gray-300 transition-colors">TV Shows</a>
