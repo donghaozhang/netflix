@@ -182,17 +182,23 @@ function App() {
 
   const fetchMovieCategories = async () => {
     try {
-      const [trending, popular, topRated, action, comedy, horror] = await Promise.all([
+      const [trending, popular, topRated, action, comedy, horror, pokemon] = await Promise.all([
         axios.get(`${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}`),
         axios.get(`${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}`),
         axios.get(`${TMDB_BASE_URL}/movie/top_rated?api_key=${TMDB_API_KEY}`),
         axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=28`),
         axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=35`),
-        axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=27`)
+        axios.get(`${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=27`),
+        axios.get(`${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=pokemon`)
       ]);
 
+      // Mix Pokemon movies with trending content for a dynamic experience
+      const pokemonMovies = pokemon.data.results.slice(0, 3);
+      const trendingMovies = trending.data.results.slice(0, 15);
+      const mixedTrending = [...mockMovieData.trending.slice(0, 5), ...pokemonMovies, ...trendingMovies];
+
       setMovieCategories({
-        trending: trending.data.results,
+        trending: mixedTrending,
         popular: popular.data.results,
         topRated: topRated.data.results,
         action: action.data.results,
