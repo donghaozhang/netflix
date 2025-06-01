@@ -206,9 +206,9 @@ export const MovieCard = ({ movie, onClick, index }) => {
     'https://images.pexels.com/photos/7941158/pexels-photo-7941158.jpeg'
   ];
 
-  const imageUrl = movie.poster_path 
-    ? IMAGE_BASE_URL + movie.poster_path 
-    : fallbackImages[index % fallbackImages.length];
+  // Use Pokemon-specific image if available, otherwise TMDB poster, otherwise fallback
+  const imageUrl = movie.pokemon_image || 
+    (movie.poster_path ? IMAGE_BASE_URL + movie.poster_path : fallbackImages[index % fallbackImages.length]);
 
   return (
     <motion.div
@@ -249,6 +249,12 @@ export const MovieCard = ({ movie, onClick, index }) => {
                   ℹ Info
                 </button>
               </div>
+              {movie.vote_average && (
+                <div className="flex items-center mt-2">
+                  <span className="text-yellow-400 text-xs">⭐</span>
+                  <span className="text-white text-xs ml-1">{movie.vote_average}/10</span>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
