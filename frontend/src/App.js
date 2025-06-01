@@ -17,6 +17,8 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 // Netflix Clone Main App Component
 function App() {
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
   const [featuredMovie, setFeaturedMovie] = useState(null);
   const [movieCategories, setMovieCategories] = useState({});
   const [selectedMovie, setSelectedMovie] = useState(null);
